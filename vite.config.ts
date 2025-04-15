@@ -8,12 +8,16 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   server: {
-    proxy: {
-      '/api/summarize': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
+    port: 3000,
+    host: true,
+    // Remove proxy for local development, connect directly to the local API
+    // Uncomment the configuration below if the API is deployed on a different server
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://your-api-server.com',
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, '')
+    //   }
+    // }
   }
 });

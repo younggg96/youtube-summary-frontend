@@ -1,3 +1,51 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Restore visual feedback for focused elements */
+:focus-visible {
+  outline: none;
+  @apply ring-2 ring-red-500;
+}
+
+/* Mobile device optimizations */
+html,
+body {
+  @apply overflow-x-hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Improve touch targets on mobile */
+@media (max-width: 768px) {
+  button, 
+  [role="button"],
+  a {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Improve scrolling experience */
+  .overflow-scroll,
+  .overflow-y-scroll,
+  .overflow-x-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Better heading line heights for mobile */
+h1, h2, h3, h4, h5, h6 {
+  @apply leading-tight;
+}
+
+/* Responsive font sizes */
+@layer base {
+  html {
+    font-size: 15px;
+  }
+  
+  @media (min-width: 768px) {
+    html {
+      font-size: 16px;
+    }
+  }
+}

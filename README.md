@@ -1,52 +1,72 @@
 # YouTube Summarizer
 
-一个基于React的YouTube视频摘要生成工具。
+A React-based tool for generating summaries of YouTube videos.
 
-## 项目结构
+## Project Structure
 
-- `frontend/`: React前端应用
-- `supabase/functions/`: Serverless函数
+- `frontend/`: React frontend application
+- `supabase/functions/`: Serverless functions
 
-## 开发环境设置
+## Development Environment Setup
 
-### 前提条件
+### Prerequisites
 
-- Node.js和npm
+1. Node.js (v16+)
+2. npm or yarn
+3. Supabase CLI (for serverless functions)
 
-### 安装依赖
+### Installation Steps
 
-```bash
-# 安装前端依赖
-npm install
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/youtube-summarizer.git
+   cd youtube-summarizer
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Start the development server:
+   ```
+   npm run dev
+   ```
+
+4. Open your browser to http://localhost:3000
+
+## Features
+
+- Search for YouTube videos
+- Generate summaries using AI
+- Track favorite creators
+- User authentication
+- Save and manage favorite videos
+
+## API Integration
+
+The application connects to a Python FastAPI backend that handles:
+- YouTube data retrieval
+- Video summarization
+- User management
+- Authentication
+
+## Deployment
+
+### Production Build
+
 ```
-
-## 开发
-
-```bash
-# 启动前端开发服务器
-npm run dev
-```
-
-## 部署
-
-```bash
-# 构建前端
 npm run build
 ```
 
-## API使用
+The build artifacts will be stored in the `dist/` directory.
 
-调用YouTube摘要API:
+### Deployment Platforms
 
-```typescript
-const response = await fetch('https://yourdomain.functions.supabase.co/youtube-summary', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ url: 'https://www.youtube.com/watch?v=...' }),
-});
+- Vercel (frontend)
+- Supabase (backend functions and database)
+- Render, Fly.io or Railway (API server)
 
-const data = await response.json();
-console.log(data.summary);
-``` 
+## License
+
+MIT 
