@@ -1,4 +1,4 @@
-import { Youtube, Github, Heart } from 'lucide-react';
+import { Heart, Youtube } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
