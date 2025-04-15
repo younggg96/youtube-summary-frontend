@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X,UserRound, UserCircle, LogIn, Home } from 'lucide-react';
+import { Menu, X, Youtube as YouTubeIcon, UserRound, UserCircle, LogIn, Home } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const MobileNav = () => {
@@ -26,7 +26,7 @@ const MobileNav = () => {
       {/* Mobile menu button */}
       <button 
         onClick={toggleMenu}
-        className="md:hidden p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+        className="md:hidden p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center"
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
         {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -48,6 +48,12 @@ const MobileNav = () => {
       >
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center p-4 border-b border-gray-800">
+            <div className="flex items-center">
+              <YouTubeIcon className="h-6 w-6 text-red-500 mr-2" />
+              <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-500">
+                YouTube Summarizer
+              </span>
+            </div>
             <button 
               onClick={closeMenu} 
               className="p-2 text-gray-300 hover:text-white rounded-lg"

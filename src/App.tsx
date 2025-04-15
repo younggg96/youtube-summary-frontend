@@ -1,17 +1,28 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { HomePage, CreatorTrackerPage, AuthPage, ProfilePage, ErrorPage } from './pages';
-import { AuthProvider } from './context/AuthContext';
-import { useAuth } from './context/AuthContext';
-import { Youtube as YouTubeIcon, UserRound, UserCircle, LogIn } from 'lucide-react';
-import Footer from './components/Footer';
-import ErrorBoundary from './components/ErrorBoundary';
-import MobileNav from './components/MobileNav';
-import ScrollToTop from './components/ScrollToTop';
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  HomePage,
+  CreatorTrackerPage,
+  AuthPage,
+  ProfilePage,
+  ErrorPage,
+} from "./pages";
+import { AuthProvider } from "./context/AuthContext";
+import { useAuth } from "./context/AuthContext";
+import {
+  Youtube as YouTubeIcon,
+  UserRound,
+  UserCircle,
+  LogIn,
+} from "lucide-react";
+import Footer from "./components/Footer";
+import ErrorBoundary from "./components/ErrorBoundary";
+import MobileNav from "./components/MobileNav";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Navigation component, shows different links based on login status
 const Navigation = () => {
   const { isAuthenticated, user } = useAuth();
-  
+
   return (
     <nav className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 mb-8">
       <div className="flex items-center justify-between py-3">
@@ -25,32 +36,32 @@ const Navigation = () => {
         </div>
         {/* Desktop Navigation - Hidden on mobile */}
         <div className="hidden md:flex space-x-4 items-center">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="px-4 py-2 flex items-center gap-1 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
           >
             <YouTubeIcon className="h-5 w-5 inline mr-1" />
             Summarize
           </Link>
-          <Link 
-            to="/creator-tracker" 
+          <Link
+            to="/creator-tracker"
             className="px-4 py-2 flex items-center gap-1 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
           >
             <UserRound className="h-5 w-5 inline mr-1" />
             Creator Tracker
           </Link>
-          
+
           {isAuthenticated ? (
-            <Link 
-              to="/profile" 
+            <Link
+              to="/profile"
               className="px-4 py-2 flex items-center gap-1 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
             >
               <UserCircle className="h-5 w-5 mr-1" />
-              {user?.username || 'Profile'}
+              {user?.username || "Profile"}
             </Link>
           ) : (
-            <Link 
-              to="/auth" 
+            <Link
+              to="/auth"
               className="px-4 py-2 flex items-center gap-1 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 transition-colors flex items-center"
             >
               <LogIn className="h-5 w-5 mr-1" />
@@ -58,7 +69,7 @@ const Navigation = () => {
             </Link>
           )}
         </div>
-        
+
         {/* Mobile Navigation */}
         <MobileNav />
       </div>
@@ -88,7 +99,7 @@ function AppContent() {
             </Routes>
           </ErrorBoundary>
         </div>
-        
+
         {/* Footer */}
         <Footer />
 
@@ -101,13 +112,17 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Routes>
-          <Route path="/*" element={<AppContent />} errorElement={<ErrorPage />} />
+          <Route
+            path="/*"
+            element={<AppContent />}
+            errorElement={<ErrorPage />}
+          />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
