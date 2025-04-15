@@ -1,55 +1,51 @@
 import React, { useState } from 'react';
 import { Send, Youtube as YouTubeIcon, Loader2 } from 'lucide-react';
 
-// 定义API端点 - 注意这里我们暂时注释掉实际API调用
-// const API_URL = 'https://yourdomain.functions.supabase.co/youtube-summary';
-
-// Mock数据函数
-const getMockSummary = (url: string) => {
-  // 模拟API延迟
-  return new Promise<{ summary: string }>((resolve) => {
-    setTimeout(() => {
-      const videoId = url.split('v=')[1];
-      resolve({
-        summary: `Mock Summary for Video ID: ${videoId}\n\nTitle: Example YouTube Video\n\nDescription: This is a mock summary of the video content. It demonstrates how the summary would look with mock data instead of real API calls. The summary includes key points from the video:\n\n• First major point discussed in the video\n• Second important topic covered\n• Key takeaways and conclusions\n• Additional insights and analysis\n\nThis mock summary helps developers test the application without making actual API calls. The formatting and structure mirror what you'd expect from the real API response.`
-      });
-    }, 1500); // 1.5秒延迟模拟API调用
-  });
-};
+// 定义API端点
+const API_URL = '/api/summarize';
 
 function App() {
   const [url, setUrl] = useState('');
   const [summary, setSummary] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [videoInfo, setVideoInfo] = useState<{
+    title?: string;
+    channel?: string;
+    thumbnail?: string;
+  }>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSummary('');
+    setVideoInfo({});
 
     try {
-      // 使用mock数据替代API调用，避免CORS问题
-      const data = await getMockSummary(url);
+      // 调用实际的后端API
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ video_url: url }),
+      });
       
-      // 真实API调用（目前被CORS阻止）
-      // const response = await fetch(API_URL, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ url }),
-      // });
+      if (!response.ok) {
+        throw new Error('Failed to generate summary');
+      }
       
-      // if (!response.ok) {
-      //   throw new Error('Failed to generate summary');
-      // }
-      
-      // const data = await response.json();
+      const data = await response.json();
       
       setSummary(data.summary);
-    } catch {
+      
+      // 如果API返回了视频信息，存储它
+      if (data.title) setVideoInfo(prev => ({ ...prev, title: data.title }));
+      if (data.channel) setVideoInfo(prev => ({ ...prev, channel: data.channel }));
+      if (data.thumbnail) setVideoInfo(prev => ({ ...prev, thumbnail: data.thumbnail }));
+    } catch (error) {
+      console.error('Error:', error);
       setError('Failed to generate summary. Please check the URL and try again.');
     } finally {
       setLoading(false);
@@ -96,7 +92,7 @@ function App() {
                     placeholder="https://www.youtube.com/watch?v=..."
                     required
                     className="block w-full pl-10 pr-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-700/50 text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
-                    pattern="^https?:\/\/(www\.)?youtube\.com\/watch\?v=.+"
+                    pattern="^https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/).+"
                   />
                 </div>
               </div>
@@ -126,11 +122,38 @@ function App() {
               </div>
             )}
 
+            {loading && (
+              <div className="mt-6 flex flex-col items-center justify-center py-8">
+                <Loader2 className="h-12 w-12 text-red-500 animate-spin" />
+                <p className="mt-4 text-lg text-gray-300">Processing video content...</p>
+                <p className="text-sm text-gray-400">This may take a minute for longer videos</p>
+              </div>
+            )}
+
             {summary && (
               <div className="mt-8 space-y-4">
                 <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-500">
                   Video Summary
                 </h2>
+
+                {videoInfo.thumbnail && (
+                  <div className="rounded-xl overflow-hidden mb-4">
+                    <img 
+                      src={videoInfo.thumbnail} 
+                      alt="Video thumbnail" 
+                      className="w-full object-cover"
+                    />
+                  </div>
+                )}
+
+                {videoInfo.title && (
+                  <h3 className="text-xl font-bold text-white mb-1">{videoInfo.title}</h3>
+                )}
+
+                {videoInfo.channel && (
+                  <p className="text-gray-400 mb-4">Channel: {videoInfo.channel}</p>
+                )}
+
                 <div className="bg-gray-700/30 rounded-xl p-6 backdrop-blur-xl border border-gray-600">
                   <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">{summary}</p>
                 </div>
