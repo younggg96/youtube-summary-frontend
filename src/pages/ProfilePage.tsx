@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { getFavorites } from '../api/authApi';
 import { getCreatorVideos } from '../api/youtubeApi';
 import { VideoInfo, UpdateUserRequest, ResetPasswordRequest } from '../types';
-import { Loader2, Heart, LogOut, Key, Save, X, Edit2, Camera } from 'lucide-react';
+import { Loader2, Heart, LogOut, Key, Save, X, Edit2 } from 'lucide-react';
 import VideoCard from '../components/VideoCard';
 
 const ProfilePage = () => {
@@ -18,7 +18,6 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState<UpdateUserRequest>({
     username: '',
     email: '',
-    avatar: '',
   });
   const [passwordData, setPasswordData] = useState<ResetPasswordRequest>({
     current_password: '',
@@ -33,7 +32,6 @@ const ProfilePage = () => {
       setProfileData({
         username: user.username || '',
         email: user.email || '',
-        avatar: user.avatar || '',
       });
     }
   }, [user]);
@@ -274,25 +272,6 @@ const ProfilePage = () => {
                     onChange={handleProfileChange}
                     className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white"
                   />
-                </div>
-
-                <div>
-                  <label htmlFor="avatar" className="block text-sm font-medium text-gray-300 mb-1">
-                    Avatar URL
-                  </label>
-                  <div className="flex">
-                    <input
-                      id="avatar"
-                      name="avatar"
-                      type="text"
-                      value={profileData.avatar}
-                      onChange={handleProfileChange}
-                      className="flex-1 px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-l-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white"
-                    />
-                    <div className="bg-gray-700 rounded-r-lg border-y border-r border-gray-600 p-2 flex items-center justify-center">
-                      <Camera className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </div>
                 </div>
 
                 <button

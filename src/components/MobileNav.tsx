@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Youtube as YouTubeIcon, UserRound, UserCircle, LogIn, Home } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);

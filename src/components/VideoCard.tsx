@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { VideoInfo } from '../types';
 import { Calendar, Eye, ThumbsUp, Clock, ExternalLink, Heart } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { addFavorite, removeFavorite } from '../api/authApi';
 
 interface VideoCardProps {

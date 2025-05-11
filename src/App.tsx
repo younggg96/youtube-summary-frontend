@@ -7,7 +7,7 @@ import {
   ErrorPage,
 } from "./pages";
 import { AuthProvider } from "./context/AuthContext";
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./hooks/useAuth";
 import {
   Youtube as YouTubeIcon,
   UserRound,

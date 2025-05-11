@@ -1,11 +1,18 @@
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { RegisterCredentials } from '../types';
 import { Loader2, UserPlus, User } from 'lucide-react';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
   onLoginClick: () => void;
+}
+
+interface ValidationError {
+  type: string;
+  loc: string[];
+  msg: string;
+  input: string;
 }
 
 const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
@@ -16,11 +23,15 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
     password: '',
     confirmPassword: '',
   });
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<ValidationError[]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCredentials(prev => ({ ...prev, [name]: value }));
+    // Clear errors when user starts typing
+    if (errors.length > 0) {
+      setErrors([]);
+    }
   };
 
   const validateForm = (): string | null => {
@@ -35,11 +46,16 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setErrors([]);
 
     const validationError = validateForm();
     if (validationError) {
-      setError(validationError);
+      setErrors([{
+        type: 'validation_error',
+        loc: ['password'],
+        msg: validationError,
+        input: credentials.password
+      }]);
       return;
     }
 
@@ -48,9 +64,45 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
       if (onSuccess) {
         onSuccess();
       }
-    } catch (err) {
-      setError((err as Error).message || 'Failed to register');
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message && err.message.includes('detail')) {
+        try {
+          const errorData = JSON.parse(err.message);
+          if (Array.isArray(errorData.detail)) {
+            setErrors(errorData.detail);
+          } else {
+            setErrors([{
+              type: 'error',
+              loc: ['general'],
+              msg: errorData.detail || 'Registration failed',
+              input: ''
+            }]);
+          }
+        } catch {
+          setErrors([{
+            type: 'error',
+            loc: ['general'],
+            msg: err.message || 'Registration failed',
+            input: ''
+          }]);
+        }
+      } else {
+        setErrors([{
+          type: 'error',
+          loc: ['general'],
+          msg: err instanceof Error ? err.message : 'Registration failed',
+          input: ''
+        }]);
+      }
     }
+  };
+
+  const getFieldError = (fieldName: string): string | null => {
+    const fieldError = errors.find(error => 
+      error.loc.includes(fieldName) || 
+      (error.loc.length > 1 && error.loc[1] === fieldName)
+    );
+    return fieldError ? fieldError.msg : null;
   };
 
   return (
@@ -63,9 +115,13 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
         <p className="text-gray-400 mt-1">Sign up to get started</p>
       </div>
 
-      {error && (
+      {errors.length > 0 && (
         <div className="bg-red-900/50 border border-red-700 rounded-lg p-3 mb-4">
-          <p className="text-red-200 text-sm">{error}</p>
+          {errors.map((error, index) => (
+            <p key={index} className="text-red-200 text-sm mb-1">
+              <span className="font-semibold capitalize">{error.loc.length > 1 ? error.loc[1] : 'Error'}</span>: {error.msg}
+            </p>
+          ))}
         </div>
       )}
 
@@ -81,9 +137,16 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
             required
             value={credentials.username}
             onChange={handleChange}
-            className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white"
+            className={`w-full px-4 py-2 bg-gray-700/50 border ${
+              getFieldError('username') ? 'border-red-500' : 'border-gray-600'
+            } rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white`}
             placeholder="Choose a username"
           />
+          {getFieldError('username') && (
+            <p className="mt-1 text-sm text-red-400">
+              <span className="font-semibold">Username</span>: {getFieldError('username')}
+            </p>
+          )}
         </div>
 
         <div>
@@ -97,9 +160,16 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
             required
             value={credentials.email}
             onChange={handleChange}
-            className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white"
+            className={`w-full px-4 py-2 bg-gray-700/50 border ${
+              getFieldError('email') ? 'border-red-500' : 'border-gray-600'
+            } rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white`}
             placeholder="Enter your email"
           />
+          {getFieldError('email') && (
+            <p className="mt-1 text-sm text-red-400">
+              <span className="font-semibold">Email</span>: {getFieldError('email')}
+            </p>
+          )}
         </div>
 
         <div>
@@ -113,10 +183,17 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
             required
             value={credentials.password}
             onChange={handleChange}
-            className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white"
+            className={`w-full px-4 py-2 bg-gray-700/50 border ${
+              getFieldError('password') ? 'border-red-500' : 'border-gray-600'
+            } rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white`}
             placeholder="Create a password"
             minLength={8}
           />
+          {getFieldError('password') && (
+            <p className="mt-1 text-sm text-red-400">
+              <span className="font-semibold">Password</span>: {getFieldError('password')}
+            </p>
+          )}
         </div>
 
         <div>
@@ -130,9 +207,16 @@ const RegisterForm = ({ onSuccess, onLoginClick }: RegisterFormProps) => {
             required
             value={credentials.confirmPassword}
             onChange={handleChange}
-            className="w-full px-4 py-2 bg-gray-700/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white"
+            className={`w-full px-4 py-2 bg-gray-700/50 border ${
+              getFieldError('confirmPassword') ? 'border-red-500' : 'border-gray-600'
+            } rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white`}
             placeholder="Confirm your password"
           />
+          {getFieldError('confirmPassword') && (
+            <p className="mt-1 text-sm text-red-400">
+              <span className="font-semibold">Confirm Password</span>: {getFieldError('confirmPassword')}
+            </p>
+          )}
         </div>
 
         <button
